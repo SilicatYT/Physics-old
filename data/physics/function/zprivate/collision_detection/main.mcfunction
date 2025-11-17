@@ -31,6 +31,8 @@ execute at @s run function physics:zprivate/collision_detection/world/main with 
 # (Important): Until now, the remaining unupdated contacts are stored in physics:temp data.Blocks. Here, the contacts get updated (if necessary) and added to the actual final storage.
 execute store result score #Physics.BlockCount Physics if data storage physics:temp data.Blocks[]
 execute if score #Physics.BlockCount Physics matches 1.. run function physics:zprivate/contact_generation/accumulate/world/not_touching/main
+#say Accumulation:
+#tellraw @p ["",{nbt:"ContactGroups",storage:"physics:zprivate"}]
 
 # Delete the "Blocks" entry in the object's contacts if no world collision was found or carried over from the last tick
 execute unless data storage physics:zprivate ContactGroups[-1].Objects[0].Blocks[0] run data remove storage physics:zprivate ContactGroups[-1].Objects[0]
@@ -45,7 +47,7 @@ scoreboard players operation #Physics.ThisObject Physics.Object.MaxPenetrationDe
 # (Important): The mini setup is run because I need to have *some* #Physics.ThisObject scores so I can do the AABB checks. I could maybe make it so it's only run if an entity is nearby, or use a predicate. Not sure what would be faster.
 scoreboard players operation @s Physics.Object.Gametime = #Physics.Gametime Physics
 execute if score #Physics.SetupDone Physics matches 0 run function physics:zprivate/collision_detection/object/mini_setup
-execute at @s as @e[type=minecraft:item_display,tag=Physics.Object,distance=..6.929] unless score @s Physics.Object.Gametime = #Physics.Gametime Physics if score @s Physics.Object.BoundingBoxGlobalMin.x <= #Physics.ThisObject Physics.Object.BoundingBoxGlobalMax.x if score #Physics.ThisObject Physics.Object.BoundingBoxGlobalMin.x <= @s Physics.Object.BoundingBoxGlobalMax.x if score @s Physics.Object.BoundingBoxGlobalMin.z <= #Physics.ThisObject Physics.Object.BoundingBoxGlobalMax.z if score #Physics.ThisObject Physics.Object.BoundingBoxGlobalMin.z <= @s Physics.Object.BoundingBoxGlobalMax.z if score @s Physics.Object.BoundingBoxGlobalMin.y <= #Physics.ThisObject Physics.Object.BoundingBoxGlobalMax.y if score #Physics.ThisObject Physics.Object.BoundingBoxGlobalMin.y <= @s Physics.Object.BoundingBoxGlobalMax.y run function physics:zprivate/collision_detection/object/sat
+#execute at @s as @e[type=minecraft:item_display,tag=Physics.Object,distance=..6.929] unless score @s Physics.Object.Gametime = #Physics.Gametime Physics if score @s Physics.Object.BoundingBoxGlobalMin.x <= #Physics.ThisObject Physics.Object.BoundingBoxGlobalMax.x if score #Physics.ThisObject Physics.Object.BoundingBoxGlobalMin.x <= @s Physics.Object.BoundingBoxGlobalMax.x if score @s Physics.Object.BoundingBoxGlobalMin.z <= #Physics.ThisObject Physics.Object.BoundingBoxGlobalMax.z if score #Physics.ThisObject Physics.Object.BoundingBoxGlobalMin.z <= @s Physics.Object.BoundingBoxGlobalMax.z if score @s Physics.Object.BoundingBoxGlobalMin.y <= #Physics.ThisObject Physics.Object.BoundingBoxGlobalMax.y if score #Physics.ThisObject Physics.Object.BoundingBoxGlobalMin.y <= @s Physics.Object.BoundingBoxGlobalMax.y run function physics:zprivate/collision_detection/object/sat
 
 # Update or discard contacts (Object)
 # (Important): Contacts for objects that are in contact are already updated directly after their respective SAT, so this only updates contacts for objects that were in contact last tick but aren't anymore.

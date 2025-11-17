@@ -4,7 +4,13 @@ function physics:zprivate/resolution/velocity/get_object_data with storage physi
 data modify storage physics:resolution Object set from storage physics:zprivate ContactGroups[{R:1b}]
 data remove storage physics:zprivate ContactGroups[{R:1b}]
 data remove storage physics:resolution Object.R
+execute store result score #Physics.HowMany Physics if data storage physics:resolution Object.Objects[0].Blocks[].Hitboxes[].Contacts[{HasMinSeparatingVelocity:0b}]
+#tellraw @a "FoundObjectA"
+#tellraw @p ["FoundObjectA (Velocity): ",{score:{name:"#Physics.HowMany",objective:"Physics"}}]
 
+execute if score #Physics.MinSeparatingVelocityTotal Physics matches ..-200 at @s run playsound minecraft:entity.player.big_fall block @a ~ ~ ~ 0.5 0.75
+
+#execute if score #Physics.HowMany Physics matches 0 run tellraw @p ["",{score:{name:"#Physics.HowMany",objective:"Physics"}},"\n",{nbt:"Object",storage:"physics:resolution"}]
 # Select the type of contact that needs to be resolved (World or object-object)
 execute store result score #Physics.ContactType Physics if data storage physics:resolution Object.Objects[0].Blocks[].Hitboxes[].Contacts[{HasMinSeparatingVelocity:0b}]
 execute if score #Physics.ContactType Physics matches 1 run return run function physics:zprivate/resolution/velocity/world/main

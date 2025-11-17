@@ -29,7 +29,7 @@
 # (Important): If this check fails, the contact is still kept for later ticks, but it will be completely ignored during resolution.
 # (Important): The contact point's y component is defined to be the min or max, so I don't have to check for that.
 scoreboard players set #Physics.IsInside Physics 0
-$execute if score #Physics.Projection.Block.WorldAxis.x.Min Physics <= #Physics.ThisObject Physics.Object.CornerPosGlobal.$(FeatureA).x if score #Physics.ThisObject Physics.Object.CornerPosGlobal.$(FeatureA).x <= #Physics.Projection.Block.WorldAxis.x.Max Physics if score #Physics.Projection.Block.WorldAxis.z.Min Physics <= #Physics.ThisObject Physics.Object.CornerPosGlobal.$(FeatureA).z if score #Physics.ThisObject Physics.Object.CornerPosGlobal.$(FeatureA).z <= #Physics.Projection.Block.WorldAxis.z.Max Physics run scoreboard players set #Physics.IsInside Physics 1
+$execute if score #Physics.Projection.Block.WorldAxis.x.Min Physics <= #Physics.ThisObject Physics.Object.CornerPosGlobal.$(FeatureA).x if score #Physics.ThisObject Physics.Object.CornerPosGlobal.$(FeatureA).x <= #Physics.Projection.Block.WorldAxis.x.Max Physics if score #Physics.Projection.Block.WorldAxis.y.Min Physics <= #Physics.ThisObject Physics.Object.CornerPosGlobal.$(FeatureA).y if score #Physics.ThisObject Physics.Object.CornerPosGlobal.$(FeatureA).y <= #Physics.Projection.Block.WorldAxis.y.Max Physics if score #Physics.Projection.Block.WorldAxis.z.Min Physics <= #Physics.ThisObject Physics.Object.CornerPosGlobal.$(FeatureA).z if score #Physics.ThisObject Physics.Object.CornerPosGlobal.$(FeatureA).z <= #Physics.Projection.Block.WorldAxis.z.Max Physics run scoreboard players set #Physics.IsInside Physics 1
 $execute if score #Physics.IsInside Physics matches 0 run data modify storage physics:zprivate ContactGroups[-1].Objects[0].Blocks[-1].Hitboxes[-1].Contacts append value {FeatureA:$(FeatureA)b,Invalid:1b}
 execute if score #Physics.IsInside Physics matches 0 store result storage physics:zprivate ContactGroups[-1].Objects[0].Blocks[-1].Hitboxes[-1].Contacts[-1].FeatureB byte 1 run return run scoreboard players get #Physics.Contact.FeatureB Physics
 
@@ -70,7 +70,6 @@ execute if score #Physics.IsInside Physics matches 0 store result storage physic
         # Subtract velocity from acceleration along contact normal
         # (Important): Because the contact normal is axis-aligned, the calculations are simplified.
         scoreboard players operation #Physics.VelocityFromAcceleration.y Physics = #Physics.ThisObject Physics.Object.DefactoGravity
-        execute if score #Physics.FeatureB Physics matches 12 run scoreboard players operation #Physics.VelocityFromAcceleration.y Physics *= #Physics.Constants.-1 Physics
         scoreboard players operation #Physics.PointVelocity.y Physics += #Physics.VelocityFromAcceleration.y Physics
 
         # Add the linear velocity to obtain the relative velocity of the contact point
@@ -88,11 +87,11 @@ data modify storage physics:zprivate ContactGroups[-1].Objects[0].Blocks[-1].Hit
 
 # Update the MaxPenetrationDepth (& keep track of the contact with the MaxPenetrationDepth)
 # (Important): The contact with the MaxPenetrationDepth has "HasMaxPenetrationDepth:0b" instead of 1b so the "store result storage ..." command works even if the command afterwards (to remove the previously tagged contact's tag) fails.
-execute if score #Physics.PenetrationDepth Physics > #Physics.ThisObject Physics.Object.MaxPenetrationDepth store result storage physics:zprivate ContactGroups[-1].Objects[0].Blocks[-1].Hitboxes[-1].Contacts[-1].HasMaxPenetrationDepth byte 0 run data remove storage physics:zprivate ContactGroups[-1].Objects[0].Blocks[].Hitboxes[].Contacts[{HasMaxPenetrationDepth:0b}].HasMaxPenetrationDepth
+execute if score #Physics.PenetrationDepth Physics > #Physics.ThisObject Physics.Object.MaxPenetrationDepth store result storage physics:zprivate ContactGroups[-1].Objects[0].Blocks[-1].Hitboxes[-1].Contacts[-1].HasMaxPenetrationDepth byte 0 run data remove storage physics:zprivate ContactGroups[-1].Objects[0].Blocks[].Hitboxes[].Contacts[].HasMaxPenetrationDepth
 execute if score #Physics.PenetrationDepth Physics > #Physics.ThisObject Physics.Object.MaxPenetrationDepth run scoreboard players operation #Physics.ThisObject Physics.Object.MaxPenetrationDepth = #Physics.PenetrationDepth Physics
 
 # Process the separating velocity (Keep track of the most negative separating velocity for the current ObjectA & tag the contact with the lowest value)
 # (Important): The contact with the MinSeparatingVelocity has "HasMinSeparatingVelocity:0b" for the same reason as "HasMaxPenetrationDepth".
 execute if score #Physics.PointVelocity.y Physics >= #Physics.ThisObject Physics.Object.MinSeparatingVelocity run return 0
-execute store result storage physics:zprivate ContactGroups[-1].Objects[0].Blocks[-1].Hitboxes[-1].Contacts[-1].HasMinSeparatingVelocity byte 0 run data remove storage physics:zprivate ContactGroups[-1].Objects[0].Blocks[].Hitboxes[].Contacts[{HasMinSeparatingVelocity:0b}].HasMinSeparatingVelocity
+execute store result storage physics:zprivate ContactGroups[-1].Objects[0].Blocks[-1].Hitboxes[-1].Contacts[-1].HasMinSeparatingVelocity byte 0 run data remove storage physics:zprivate ContactGroups[-1].Objects[0].Blocks[].Hitboxes[].Contacts[].HasMinSeparatingVelocity
 scoreboard players operation #Physics.ThisObject Physics.Object.MinSeparatingVelocity = #Physics.PointVelocity.y Physics

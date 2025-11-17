@@ -22,7 +22,6 @@ execute if score #Physics.ContactCount Physics matches 4 run return 0
 
 # Contact 5
 $execute if data storage physics:temp data.UpdateBlocks[-1].Hitboxes[$(Index)].Contacts[4].PenetrationDepth run function physics:zprivate/resolution/penetration/world/update_penetration_depth/update_contact_4 {Index:$(Index)}
-execute if score #Physics.ContactCount Physics matches 5 run return 0
 
 # Contact 6
-$execute if data storage physics:temp data.UpdateBlocks[-1].Hitboxes[$(Index)].Contacts[5].PenetrationDepth run function physics:zprivate/resolution/penetration/world/update_penetration_depth/update_contact_5 {Index:$(Index)}
+$execute unless score #Physics.ContactCount Physics matches 5 if data storage physics:temp data.UpdateBlocks[-1].Hitboxes[$(Index)].Contacts[5].PenetrationDepth run function physics:zprivate/resolution/penetration/world/update_penetration_depth/update_contact_5 {Index:$(Index)}

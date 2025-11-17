@@ -196,7 +196,7 @@ scoreboard players set #Physics.LookingAtID Physics 0
 
 scoreboard players set #Physics.Settings.DefaultPlayerStrength Physics 30
 scoreboard players set #Physics.Settings.ReactToBlockUpdates Physics 1
-scoreboard players set #Physics.Settings.DefaultGravity Physics -490
+scoreboard players set #Physics.Settings.DefaultGravity Physics -49
 scoreboard players set #Physics.Settings.LinearDamping Physics 98
 scoreboard players set #Physics.Settings.AngularDamping Physics 98
 scoreboard players set #Physics.Settings.Accumulation.MinPenetrationDepth Physics -50

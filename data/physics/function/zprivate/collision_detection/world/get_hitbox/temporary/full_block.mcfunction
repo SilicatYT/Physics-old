@@ -1,3 +1,5 @@
+    scoreboard players set #Physics.StoppedEarly Physics 0
+
 # SET THESE AT THE END OF THE PREVIOUS BLOCK IF ITS DATA WAS DIFFERENT, SO THESE SCORES DONT HAVE TO BE SET EVERY TIME
 scoreboard players set #Physics.BlockDiagonalLength Physics 1732
 
@@ -12,6 +14,7 @@ scoreboard players add #Physics.Projection.Block.WorldAxis.z.Max Physics 500
 # Run SAT
 function physics:zprivate/collision_detection/world/sat
 execute if score #Physics.Touching Physics matches 0 run return 0
+execute if score #Physics.StoppedEarly Physics matches 1 run data remove storage physics:zprivate ContactGroups[-1].Objects[0].Blocks[-1].Hitboxes[-1]
 
 # IT SHOULD ONLY RUN THE OPERATIONS ON "data.Block" IF A HITBOX PRIOR TO THOSE CHECKS HAS PASSED THE SAT, BECAUSE ONLY THEN IS THE STORAGE SET.
 
@@ -45,9 +48,8 @@ execute store result storage physics:zprivate ContactGroups[-1].Objects[0].Block
 #    Instead, I should run an alternative "get_hitbox" function in "physics:zprivate/contact_generation/accumulate/world/not_touching/main" for each block in the "data.Blocks" storage. This is just 1 macro per block that already has contacts (+ the "get hitbox" overhead of course).
 
 # data.Hitbox is NOT reset at the start because two separate objects can't have the exact same data (same feature pair, same contact point etc), so it'll always be overwritten
-
 execute store success score #Physics.HitboxHasPreviousContacts Physics run data modify storage physics:temp data.Hitbox set from storage physics:temp data.Block.Hitboxes[0]
-execute if score #Physics.HitboxHasPreviousContacts Physics matches 0 run return 0
+execute if score #Physics.HitboxHasPreviousContacts Physics matches 0 run return run execute unless data storage physics:zprivate ContactGroups[-1].Objects[0].Blocks[-1].Hitboxes[0].Contacts[0] run data remove storage physics:zprivate ContactGroups[-1].Objects[0].Blocks[-1]
 execute store result score #Physics.ContactCount Physics if data storage physics:temp data.Hitbox.Contacts[]
 execute if score #Physics.ContactCount Physics matches 1.. run function physics:zprivate/contact_generation/accumulate/world/touching/update_hitbox
 data remove storage physics:temp data.Block
@@ -69,3 +71,7 @@ data remove storage physics:temp data.Block
 
 
 # In collision_detection/main, I only accumulate non-touching blocks. And here, I only seem to accumulate hitboxes that are currently touching. But what if a *different* hitbox was touching? I need to make sure I *don't* early-out (or if I do, make absolutely sure I have no data for that block from the previous tick), so I can update the contacts for that block regardless what hitboxes I'm currently touching. Maybe "return 0 IF there is no remaining un-updated hitbox data from the previous tick for this block"
+
+
+
+execute unless data storage physics:zprivate ContactGroups[-1].Objects[0].Blocks[-1].Hitboxes[0].Contacts[0] run data remove storage physics:zprivate ContactGroups[-1].Objects[0].Blocks[-1]

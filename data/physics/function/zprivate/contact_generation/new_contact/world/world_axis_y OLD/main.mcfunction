@@ -1,6 +1,3 @@
-
-#tellraw @p ["Block Bounds: ",{score:{name:"#Physics.Projection.Block.WorldAxis.x.Min",objective:"Physics"}}," ",{score:{name:"#Physics.Projection.Block.WorldAxis.x.Max",objective:"Physics"}}," ",{score:{name:"#Physics.Projection.Block.WorldAxis.y.Min",objective:"Physics"}}," ",{score:{name:"#Physics.Projection.Block.WorldAxis.y.Max",objective:"Physics"}}," ",{score:{name:"#Physics.Projection.Block.WorldAxis.z.Min",objective:"Physics"}}," ",{score:{name:"#Physics.Projection.Block.WorldAxis.z.Max",objective:"Physics"}}]
-#say new contact
 # Get the object's feature (Face that's closest to the world-geometry block)
 # (Important): There are 2 candidate faces (those normal to the axis), and I select the correct one by looking at the projection of a single point of them and looking which is closer. If I look at the same point for both faces, I can easily get which face is closer.
 execute store success score #Physics.InvertValues Physics if score #Physics.ThisObject Physics.Object.BoundingBoxGlobalMin.y < #Physics.Projection.Block.WorldAxis.y.Min Physics
@@ -9,33 +6,19 @@ execute if score #Physics.InvertValues Physics matches 0 store result storage ph
 
 # Get the world-geometry block's feature (Corner that's closest to the object)
 # (Important): I check which of the 8 corners' projection is the closest to the object along the axis (furthest along the axis), so I have to get either the min or the max.
-#execute if score #Physics.InvertValues Physics matches 1 run scoreboard players operation #Physics.DeepestProjection Physics = #Physics.ThisObject Physics.Object.BoundingBoxGlobalMax.y
-#execute if score #Physics.InvertValues Physics matches 0 run scoreboard players operation #Physics.DeepestProjection Physics = #Physics.ThisObject Physics.Object.BoundingBoxGlobalMin.y
-execute if score #Physics.InvertValues Physics matches 1 run scoreboard players set #Physics.DeepestProjection Physics -9999999
-execute if score #Physics.InvertValues Physics matches 0 run scoreboard players set #Physics.DeepestProjection Physics 9999999
+execute if score #Physics.InvertValues Physics matches 1 run scoreboard players operation #Physics.DeepestProjection Physics = #Physics.ThisObject Physics.Object.BoundingBoxGlobalMax.y
+execute if score #Physics.InvertValues Physics matches 0 run scoreboard players operation #Physics.DeepestProjection Physics = #Physics.ThisObject Physics.Object.BoundingBoxGlobalMin.y
 
     # Set the feature
     # (Important): There are only 8 corners (and unique macro variable combinations), so everything is cached. Reduces duplicate files.
-    #execute if score #Physics.DeepestProjection Physics = #Physics.ThisObject Physics.Object.CornerPosGlobal.0.y run function physics:zprivate/contact_generation/new_contact/world/world_axis_y/get_corner {Corner:0b}
-    #execute if score #Physics.DeepestProjection Physics = #Physics.ThisObject Physics.Object.CornerPosGlobal.1.y run function physics:zprivate/contact_generation/new_contact/world/world_axis_y/get_corner {Corner:1b}
-    #execute if score #Physics.DeepestProjection Physics = #Physics.ThisObject Physics.Object.CornerPosGlobal.2.y run function physics:zprivate/contact_generation/new_contact/world/world_axis_y/get_corner {Corner:2b}
-    #execute if score #Physics.DeepestProjection Physics = #Physics.ThisObject Physics.Object.CornerPosGlobal.3.y run function physics:zprivate/contact_generation/new_contact/world/world_axis_y/get_corner {Corner:3b}
-    #execute if score #Physics.DeepestProjection Physics = #Physics.ThisObject Physics.Object.CornerPosGlobal.4.y run function physics:zprivate/contact_generation/new_contact/world/world_axis_y/get_corner {Corner:4b}
-    #execute if score #Physics.DeepestProjection Physics = #Physics.ThisObject Physics.Object.CornerPosGlobal.5.y run function physics:zprivate/contact_generation/new_contact/world/world_axis_y/get_corner {Corner:5b}
-    #execute if score #Physics.DeepestProjection Physics = #Physics.ThisObject Physics.Object.CornerPosGlobal.6.y run function physics:zprivate/contact_generation/new_contact/world/world_axis_y/get_corner {Corner:6b}
-    #execute if score #Physics.DeepestProjection Physics = #Physics.ThisObject Physics.Object.CornerPosGlobal.7.y run function physics:zprivate/contact_generation/new_contact/world/world_axis_y/get_corner {Corner:7b}
-    scoreboard players set #Physics.FeatureA Physics -1
-    function physics:zprivate/contact_generation/new_contact/world/world_axis_y/test {Corner:0b}
-    function physics:zprivate/contact_generation/new_contact/world/world_axis_y/test {Corner:1b}
-    function physics:zprivate/contact_generation/new_contact/world/world_axis_y/test {Corner:2b}
-    function physics:zprivate/contact_generation/new_contact/world/world_axis_y/test {Corner:3b}
-    function physics:zprivate/contact_generation/new_contact/world/world_axis_y/test {Corner:4b}
-    function physics:zprivate/contact_generation/new_contact/world/world_axis_y/test {Corner:5b}
-    function physics:zprivate/contact_generation/new_contact/world/world_axis_y/test {Corner:6b}
-    function physics:zprivate/contact_generation/new_contact/world/world_axis_y/test {Corner:7b}
-                    execute if score #Physics.FeatureA Physics matches -1 run return run scoreboard players set #Physics.StoppedEarly Physics 1
-    execute store result storage physics:temp data.Corner byte 1 run scoreboard players get #Physics.FeatureA Physics
-    function physics:zprivate/contact_generation/new_contact/world/world_axis_y/get_corner with storage physics:temp data
+    execute if score #Physics.DeepestProjection Physics = #Physics.ThisObject Physics.Object.CornerPosGlobal.0.y run function physics:zprivate/contact_generation/new_contact/world/world_axis_y/get_corner {Corner:0b}
+    execute if score #Physics.DeepestProjection Physics = #Physics.ThisObject Physics.Object.CornerPosGlobal.1.y run function physics:zprivate/contact_generation/new_contact/world/world_axis_y/get_corner {Corner:1b}
+    execute if score #Physics.DeepestProjection Physics = #Physics.ThisObject Physics.Object.CornerPosGlobal.2.y run function physics:zprivate/contact_generation/new_contact/world/world_axis_y/get_corner {Corner:2b}
+    execute if score #Physics.DeepestProjection Physics = #Physics.ThisObject Physics.Object.CornerPosGlobal.3.y run function physics:zprivate/contact_generation/new_contact/world/world_axis_y/get_corner {Corner:3b}
+    execute if score #Physics.DeepestProjection Physics = #Physics.ThisObject Physics.Object.CornerPosGlobal.4.y run function physics:zprivate/contact_generation/new_contact/world/world_axis_y/get_corner {Corner:4b}
+    execute if score #Physics.DeepestProjection Physics = #Physics.ThisObject Physics.Object.CornerPosGlobal.5.y run function physics:zprivate/contact_generation/new_contact/world/world_axis_y/get_corner {Corner:5b}
+    execute if score #Physics.DeepestProjection Physics = #Physics.ThisObject Physics.Object.CornerPosGlobal.6.y run function physics:zprivate/contact_generation/new_contact/world/world_axis_y/get_corner {Corner:6b}
+    execute if score #Physics.DeepestProjection Physics = #Physics.ThisObject Physics.Object.CornerPosGlobal.7.y run function physics:zprivate/contact_generation/new_contact/world/world_axis_y/get_corner {Corner:7b}
 
 # Calculate Penetration Depth, Contact Normal, Contact Point & Separating Velocity
     # Penetration Depth
@@ -85,7 +68,7 @@ execute if score #Physics.InvertValues Physics matches 0 run scoreboard players 
         # (Important): Normally you just subtract it from SeparatingVelocity so that ContactVelocity remains intact (the tangents need to be untouched!), but if I subtract the projection from both, then I don't have to repeatedly do that during each iteration of resolution.
         # (Important): Because the contact normal is axis-aligned, these calculations are simplified.
         scoreboard players operation #Physics.VelocityFromAcceleration.y Physics = #Physics.ThisObject Physics.Object.DefactoGravity
-        #execute if score #Physics.InvertValues Physics matches 1 run scoreboard players operation #Physics.VelocityFromAcceleration.y Physics *= #Physics.Constants.-1 Physics
+        execute if score #Physics.InvertValues Physics matches 1 run scoreboard players operation #Physics.VelocityFromAcceleration.y Physics *= #Physics.Constants.-1 Physics
         scoreboard players operation #Physics.PointVelocity.y Physics -= #Physics.VelocityFromAcceleration.y Physics
 
         # Add the linear velocity to obtain the relative velocity of the contact point
@@ -100,7 +83,7 @@ execute if score #Physics.InvertValues Physics matches 0 run scoreboard players 
 
 # Store the contact
 data modify storage physics:zprivate ContactGroups[-1].Objects[0].Blocks[-1].Hitboxes[-1].Contacts append from storage physics:temp data.NewContact
-#tellraw @p ["",{nbt:"ContactGroups",storage:"physics:zprivate"}]
+
 # Update the MaxPenetrationDepth (& keep track of the contact with the MaxPenetrationDepth)
 # (Important): The contact with the MaxPenetrationDepth has "HasMaxPenetrationDepth:0b" instead of 1b so the "store result storage ..." command works even if the command afterwards (to remove the previously tagged contact's tag) fails.
 execute if score #Physics.PenetrationDepth Physics > #Physics.ThisObject Physics.Object.MaxPenetrationDepth store result storage physics:zprivate ContactGroups[-1].Objects[0].Blocks[-1].Hitboxes[-1].Contacts[-1].HasMaxPenetrationDepth byte 0 run data remove storage physics:zprivate ContactGroups[-1].Objects[0].Blocks[].Hitboxes[].Contacts[].HasMaxPenetrationDepth

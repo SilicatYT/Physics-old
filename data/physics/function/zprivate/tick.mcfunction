@@ -21,20 +21,20 @@ execute as @a unless score @s Physics.Player.ID matches 1.. run function physics
     # (Important): Because interaction entities can unload, players can leave etc.
     execute if score #Physics.InteractionCount Physics > #Physics.SuccessfulTeleports Physics as @e[type=minecraft:interaction,tag=Physics.Hitbox] unless score @s Physics.Hitbox.Gametime = #Physics.Gametime Physics run function physics:zprivate/line_of_sight/kill_leftover
 
-# Integration (Part 1): Update internal values
-execute as @e[type=minecraft:item_display,tag=Physics.Object] run function physics:zprivate/integration/1
-
 # Contact Generation: Setup
 # (Important): The last command is run so the "HitboxHasPreviousContacts" score doesn't get set to 0 if the data matches the previous tick's data exactly (Which only really happens if only one object exists).
     # Remove data from contact accumulation or resolution from contacts
-    data remove storage physics:temp data.ContactGroups[].Objects[].Contacts[].Invalid
-    data remove storage physics:temp data.ContactGroups[].Objects[].Blocks[].Hitboxes[].Contacts[].Invalid
-    data remove storage physics:temp data.ContactGroups[].Objects[].Contacts[].EffectiveMass
-    data remove storage physics:temp data.ContactGroups[].Objects[].Blocks[].Hitboxes[].Contacts[].EffectiveMass
+    data remove storage physics:zprivate ContactGroups[].Objects[].Contacts[].Invalid
+    data remove storage physics:zprivate ContactGroups[].Objects[].Blocks[].Hitboxes[].Contacts[].Invalid
+    data remove storage physics:zprivate ContactGroups[].Objects[].Contacts[].EffectiveMass
+    data remove storage physics:zprivate ContactGroups[].Objects[].Blocks[].Hitboxes[].Contacts[].EffectiveMass
 
 data modify storage physics:temp data.ContactGroupsPrevious set from storage physics:zprivate ContactGroups
 data modify storage physics:zprivate ContactGroups set value []
 data remove storage physics:temp data.Hitbox
+
+# Integration (Part 1): Update internal values
+execute as @e[type=minecraft:item_display,tag=Physics.Object] run function physics:zprivate/integration/1
 
 # Collision Detection (Minecraft blocks & Dynamic objects) & Contact Generation
 execute as @e[type=minecraft:item_display,tag=Physics.Object] run function physics:zprivate/collision_detection/main
@@ -43,9 +43,18 @@ execute as @e[type=minecraft:item_display,tag=Physics.Object] run function physi
 execute store result score #Physics.MaxIterations Physics if data storage physics:zprivate ContactGroups[].Objects[].Contacts[]
 execute store result score #Physics.Temp Physics if data storage physics:zprivate ContactGroups[].Objects[].Blocks[].Hitboxes[].Contacts[]
 execute store result score #Physics.RemainingIterations Physics run scoreboard players operation #Physics.MaxIterations Physics += #Physics.Temp Physics
+
+scoreboard players operation #Physics.RemainingIterations Physics *= #Physics.Constants.2 Physics
 execute if score #Physics.RemainingIterations Physics matches 1.. run function physics:zprivate/resolution/velocity/main
 scoreboard players operation #Physics.RemainingIterations Physics = #Physics.MaxIterations Physics
 execute if score #Physics.RemainingIterations Physics matches 1.. run function physics:zprivate/resolution/penetration/main
 
 # Integration (Part 2): Update visual state
 execute as @e[type=minecraft:item_display,tag=Physics.Object] run function physics:zprivate/integration/2
+
+# TODO: I need to update some scores like the bounding box before I run line of sight or debug: show_axes, because otherwise it'll show the hitbox inside the ground before penetration resolution is run.
+# But at the same time: Then it would be outdated when I start the AABB check (because of accumulated forces & gravity). What to do?
+# I don't want to calculate it twice. But also, I don't want the hitbox not to work properly...
+# Either:
+# - Set the bounding box scores before gravity is applied (BAD IDEA: AABB check won't run properly)
+# - Update Bounding box scores manually when resolving penetration

@@ -14,9 +14,10 @@ scoreboard players operation #Physics.PenetrationDepthDifference Physics /= #Phy
 
 # Update the PenetrationDepth
 $execute store result score #Physics.PenetrationDepth Physics run data get storage physics:temp data.UpdateBlocks[-1].Hitboxes[$(Index)].Contacts[4].PenetrationDepth
-execute store result storage physics:temp data.UpdateBlocks[-1].Hitboxes[$(Index)].Contacts[4].PenetrationDepth short 1 run scoreboard players operation #Physics.PenetrationDepth Physics += #Physics.PenetrationDepthDifference Physics
+$execute store result storage physics:temp data.UpdateBlocks[-1].Hitboxes[$(Index)].Contacts[4].PenetrationDepth short 1 run scoreboard players operation #Physics.PenetrationDepth Physics -= #Physics.PenetrationDepthDifference Physics
 
 # Update the MaxPenetrationDepth
 execute if score #Physics.PenetrationDepth Physics <= @s Physics.Object.MaxPenetrationDepth run return 0
-execute store result storage physics:zprivate ContactGroups[-1].Objects[0].Blocks[-1].Hitboxes[-1].Contacts[-1].HasMaxPenetrationDepth byte 0 run data remove storage physics:resolution Object.Objects[0].Blocks[].Hitboxes[].Contacts[{HasMaxPenetrationDepth:0b}].HasMaxPenetrationDepth
+data remove storage physics:temp data.UpdateBlocks[-1].Hitboxes[].Contacts[].HasMaxPenetrationDepth
+$execute store result storage physics:temp data.UpdateBlocks[-1].Hitboxes[$(Index)].Contacts[4].HasMaxPenetrationDepth byte 0 run data remove storage physics:resolution Object.Objects[0].Blocks[].Hitboxes[].Contacts[].HasMaxPenetrationDepth
 scoreboard players operation @s Physics.Object.MaxPenetrationDepth = #Physics.PenetrationDepth Physics

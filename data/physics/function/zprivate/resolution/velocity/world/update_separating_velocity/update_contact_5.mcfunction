@@ -1,19 +1,19 @@
 # Setup
 $execute store result score #Physics.Maths.RelativeContactPos.x Physics run data get storage physics:temp data.UpdateBlocks[-1].Hitboxes[$(Index)].Contacts[5].ContactPoint[0]
-$execute store result score #Physics.Maths.RelativeContactPos.y Physics run data get storage physics:temp data.UpdateBlocks[-1].Hitboxes[$(Index)].Contacts[5].ContactPoint[1]
+$execute store result score #Physics.ContactVelocityChange.z Physics run data get storage physics:temp data.UpdateBlocks[-1].Hitboxes[$(Index)].Contacts[5].ContactPoint[1]
 $execute store result score #Physics.Maths.RelativeContactPos.z Physics run data get storage physics:temp data.UpdateBlocks[-1].Hitboxes[$(Index)].Contacts[5].ContactPoint[2]
+
 scoreboard players operation #Physics.Maths.RelativeContactPos.x Physics -= @s Physics.Object.Pos.x
-scoreboard players operation #Physics.Maths.RelativeContactPos.y Physics -= @s Physics.Object.Pos.y
+scoreboard players operation #Physics.ContactVelocityChange.z Physics -= @s Physics.Object.Pos.y
 scoreboard players operation #Physics.Maths.RelativeContactPos.z Physics -= @s Physics.Object.Pos.z
 
-scoreboard players operation #Physics.ContactVelocityChange.z Physics = #Physics.AngularVelocityChange.x Physics
 scoreboard players operation #Physics.ContactVelocityChange.x Physics = #Physics.AngularVelocityChange.y Physics
-scoreboard players operation #Physics.ContactVelocityChange.y Physics = #Physics.AngularVelocityChange.z Physics
+execute store result score #Physics.Maths.Value1 Physics run scoreboard players operation #Physics.ContactVelocityChange.y Physics = #Physics.AngularVelocityChange.z Physics
 
 # Cross product
 scoreboard players operation #Physics.ContactVelocityChange.x Physics *= #Physics.Maths.RelativeContactPos.z Physics
-scoreboard players operation #Physics.Maths.RelativeContactPos.y Physics *= #Physics.AngularVelocityChange.z Physics
-scoreboard players operation #Physics.ContactVelocityChange.x Physics -= #Physics.Maths.RelativeContactPos.y Physics
+scoreboard players operation #Physics.Maths.Value1 Physics *= #Physics.ContactVelocityChange.z Physics
+scoreboard players operation #Physics.ContactVelocityChange.x Physics -= #Physics.Maths.Value1 Physics
 scoreboard players operation #Physics.ContactVelocityChange.x Physics /= #Physics.Constants.1000 Physics
 
 scoreboard players operation #Physics.ContactVelocityChange.y Physics *= #Physics.Maths.RelativeContactPos.x Physics
@@ -21,7 +21,7 @@ scoreboard players operation #Physics.Maths.RelativeContactPos.z Physics *= #Phy
 scoreboard players operation #Physics.ContactVelocityChange.y Physics -= #Physics.Maths.RelativeContactPos.z Physics
 scoreboard players operation #Physics.ContactVelocityChange.y Physics /= #Physics.Constants.1000 Physics
 
-scoreboard players operation #Physics.ContactVelocityChange.z Physics *= #Physics.Maths.RelativeContactPos.y Physics
+scoreboard players operation #Physics.ContactVelocityChange.z Physics *= #Physics.AngularVelocityChange.x Physics
 scoreboard players operation #Physics.Maths.RelativeContactPos.x Physics *= #Physics.AngularVelocityChange.y Physics
 scoreboard players operation #Physics.ContactVelocityChange.z Physics -= #Physics.Maths.RelativeContactPos.x Physics
 scoreboard players operation #Physics.ContactVelocityChange.z Physics /= #Physics.Constants.1000 Physics
@@ -48,8 +48,9 @@ scoreboard players operation #Physics.ContactNormal.y Physics *= #Physics.Contac
 scoreboard players operation #Physics.ContactNormal.z Physics *= #Physics.ContactVelocity.z Physics
 scoreboard players operation #Physics.ContactNormal.x Physics += #Physics.ContactNormal.y Physics
 scoreboard players operation #Physics.ContactNormal.x Physics += #Physics.ContactNormal.z Physics
-scoreboard players operation #Physics.ContactNormal.x Physics /= #Physics.Constants.1000 Physics
+$execute store result storage physics:temp data.UpdateBlocks[-1].Hitboxes[$(Index)].Contacts[5].SeparatingVelocity short 1 run scoreboard players operation #Physics.ContactNormal.x Physics /= #Physics.Constants.1000 Physics
 
-execute if score @s Physics.Object.MinSeparatingVelocity < #Physics.ContactNormal.x Physics run return 0
-$execute store result storage physics:temp data.UpdateBlocks[-1].Hitboxes[$(Index)].Contacts[5].HasMinSeparatingVelocity byte 0 run data remove storage physics:resolution Object.Objects[0].Blocks[].Hitboxes[].Contacts[{HasMinSeparatingVelocity:0b}].HasMinSeparatingVelocity
+execute if score @s Physics.Object.MinSeparatingVelocity <= #Physics.ContactNormal.x Physics run return 0
+data remove storage physics:temp data.UpdateBlocks[-1].Hitboxes[].Contacts[].HasMinSeparatingVelocity
+$execute store result storage physics:temp data.UpdateBlocks[-1].Hitboxes[$(Index)].Contacts[5].HasMinSeparatingVelocity byte 0 run data remove storage physics:resolution Object.Objects[0].Blocks[].Hitboxes[].Contacts[].HasMinSeparatingVelocity
 scoreboard players operation @s Physics.Object.MinSeparatingVelocity = #Physics.ContactNormal.x Physics

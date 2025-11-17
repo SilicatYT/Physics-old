@@ -1,3 +1,4 @@
+#tellraw @p "b"
 # Get the block data that contains the contact to be resolved & remove the original
 data modify storage physics:resolution Block set from storage physics:resolution Object.Objects[0].Blocks[{Hitboxes:[{Contacts:[{HasMaxPenetrationDepth:0b}]}]}]
 data remove storage physics:resolution Object.Objects[0].Blocks[{Hitboxes:[{Contacts:[{HasMaxPenetrationDepth:0b}]}]}]
@@ -31,10 +32,34 @@ data remove storage physics:resolution Hitbox.Contacts[{HasMaxPenetrationDepth:0
     scoreboard players operation @s Physics.Object.Pos.y += #Physics.Movement.y Physics
     scoreboard players operation @s Physics.Object.Pos.z += #Physics.Movement.z Physics
 
-data modify storage physics:resolution Contact.PenetrationDepth set value 0s
+
+
+                # Calculate movement along the contact normal
+                # (Important): Movement * ContactNormal
+                execute store result score #Physics.PenetrationDepthDifference Physics run data get storage physics:resolution Contact.ContactNormal[0]
+                execute store result score #Physics.Maths.Value1 Physics run data get storage physics:resolution Contact.ContactNormal[1]
+                execute store result score #Physics.Maths.Value2 Physics run data get storage physics:resolution Contact.ContactNormal[2]
+
+                scoreboard players operation #Physics.PenetrationDepthDifference Physics *= #Physics.Movement.x Physics
+                scoreboard players operation #Physics.Maths.Value1 Physics *= #Physics.Movement.y Physics
+                scoreboard players operation #Physics.Maths.Value2 Physics *= #Physics.Movement.z Physics
+
+                scoreboard players operation #Physics.PenetrationDepthDifference Physics += #Physics.Maths.Value1 Physics
+                scoreboard players operation #Physics.PenetrationDepthDifference Physics += #Physics.Maths.Value2 Physics
+                scoreboard players operation #Physics.PenetrationDepthDifference Physics /= #Physics.Constants.1000 Physics
+
+                execute store result storage physics:resolution Contact.PenetrationDepth short 1 run scoreboard players operation #Physics.MaxPenetrationDepthTotal Physics -= #Physics.PenetrationDepthDifference Physics
+
+#data modify storage physics:resolution Contact.PenetrationDepth set value 0s
+# ^ maybe that's causing the clipping? Where it can build up small rounding errors over time and *think* it's not penetrating?
 
 # Update other contacts' PenetrationDepth
 scoreboard players set @s Physics.Object.MaxPenetrationDepth -2147483648
+
+#tellraw @p ["Object: ",{nbt:"Object",storage:"physics:resolution"}]
+#tellraw @p ["Block: ",{nbt:"Block",storage:"physics:resolution"}]
+#tellraw @p ["Hitbox: ",{nbt:"Hitbox",storage:"physics:resolution"}]
+#tellraw @p ["Contact: ",{nbt:"Contact",storage:"physics:resolution"}]
 
     # World contacts
         # Update the contacts from the remaining blocks (Blocks that don't contain the newly resolved contact)
@@ -51,9 +76,9 @@ scoreboard players set @s Physics.Object.MaxPenetrationDepth -2147483648
         data modify storage physics:resolution Object.Objects[0].Blocks append from storage physics:temp data.UpdateBlocks[-1]
 
         # Tag the newly resolved contact if necessary and add it to the hitbox
-        execute if score @s Physics.Object.MaxPenetrationDepth matches 0.. run data remove storage physics:resolution Contact.HasMaxPenetrationDepth
-        execute if score @s Physics.Object.MaxPenetrationDepth matches ..-1 run data remove storage physics:resolution Object.Objects[0].Blocks[].Hitboxes[].Contacts[].HasMaxPenetrationDepth
-        execute if score @s Physics.Object.MaxPenetrationDepth matches ..-1 run scoreboard players set @s Physics.Object.MaxPenetrationDepth 0
+        execute if score @s Physics.Object.MaxPenetrationDepth >= #Physics.MaxPenetrationDepthTotal Physics run data remove storage physics:resolution Contact.HasMaxPenetrationDepth
+        execute if score @s Physics.Object.MaxPenetrationDepth < #Physics.MaxPenetrationDepthTotal Physics run data remove storage physics:resolution Object.Objects[0].Blocks[].Hitboxes[].Contacts[].HasMaxPenetrationDepth
+        execute if score @s Physics.Object.MaxPenetrationDepth < #Physics.MaxPenetrationDepthTotal Physics run scoreboard players set @s Physics.Object.MaxPenetrationDepth 0
         data modify storage physics:resolution Object.Objects[0].Blocks[-1].Hitboxes[-1].Contacts append from storage physics:resolution Contact
 
         # Set the MaxPenetrationDepth.World
@@ -62,5 +87,14 @@ scoreboard players set @s Physics.Object.MaxPenetrationDepth -2147483648
     # Object-object contacts
     # ...
 
+#tellraw @p ["Object: ",{nbt:"Object",storage:"physics:resolution"}]
+#tellraw @p ["Block: ",{nbt:"Block",storage:"physics:resolution"}]
+#tellraw @p ["Hitbox: ",{nbt:"Hitbox",storage:"physics:resolution"}]
+#tellraw @p ["Contact: ",{nbt:"Contact",storage:"physics:resolution"}]
+
     # Add the object data back to the final storage
     data modify storage physics:zprivate ContactGroups append from storage physics:resolution Object
+
+execute store result score #Physics.HowMany Physics if data storage physics:zprivate ContactGroups[].Objects[0].Blocks[].Hitboxes[].Contacts[{HasMaxPenetrationDepth:0b}]
+#tellraw @a "FoundObjectA"
+#tellraw @p ["End of penetration resolution: ",{score:{name:"#Physics.HowMany",objective:"Physics"}}]

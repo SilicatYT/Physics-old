@@ -1,3 +1,6 @@
+execute store result score #Physics.HowMany Physics if data storage physics:resolution Object.Objects[0].Blocks[]
+#execute if score #Physics.HowMany Physics matches 0 run tellraw @p ["Main: ",{score:{name:"#Physics.HowMany",objective:"Physics"}}]
+
 # Get MinSeparatingVelocity of all objects combined & select that as the entity to be resolved
 scoreboard players set #Physics.MinSeparatingVelocityTotal Physics 2147483647
 scoreboard players operation #Physics.MinSeparatingVelocityTotal Physics < @e[type=minecraft:item_display,tag=Physics.Object] Physics.Object.MinSeparatingVelocity

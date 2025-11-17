@@ -12,7 +12,7 @@
 # (Important): Scale of local inertia and/or inverse mass *could* maybe be adjusted without losing accuracy? Could save some divisions
 # TODO: Remove InverseMassScaled2 if it's unused even for edge-edge effective mass
 
-# Maybe store the relativeContactPos in the data alongside effective mass (after being resolved once, ofc)? Would avoid calculating it twice when it's already calculated for the effective mass stuff. For world contacts, maybe I can overwrite "ContactPoint"? For object-object, that wouldn't work though
+# Maybe store the relativeContactPos in the data alongside effective mass (after being resolved once, ofc)? Would avoid calculating it twice when it's already calculated for the effective mass stuff. But overhead for storing. For world contacts, maybe I can overwrite "ContactPoint"? For object-object, that wouldn't work though
 
 # Maybe optimize "update separating velocity for other contacts" by updating the 1st hitbox of each block and the 1st contact of each hitbox directly (More hardcoding, but avoids function calls)
 
@@ -25,6 +25,12 @@
 # => Also, check if I still need Invalid:1b in some invalid contacts. I just check if the contact has PenetrationDepth. If not, I just don't update it anymore.
 
 
+# Currently, collision detection / contact generation can detect the wrong features. For point-face, it just checks which corner has the deepest penetration. But if the object is perfectly aligned, then 4 corners have the deepest penetration, although only 1 is actually inside the other object
+    # MAYBE: With rounding errors, it could PERHAPS detect a contact as point-face even though it's edge-edge, and then it breaks if it uses the deepest point that's not in the block at all? So MAYBE I have to check for that even if I find a clever workaround for "multiple corners have the same penetration depth"
+    # BUT: If I only accept corners that are actually in the block, won't it break if a corner clips through the entire block (e.g. a carpet) in a single tick?
+
+
+# With hitbox culling, I'll need to rework some things. For example, I can't just assume a new contact has been added (or the block's data is already present) just because a block is "Touching". I need some different checks
 
 
 
