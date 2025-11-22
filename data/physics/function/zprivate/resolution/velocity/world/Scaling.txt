@@ -1,3 +1,0 @@
-Scheint nur begrenzt (oder überhaupt nicht) zu nützen, den Impuls 7x zu skalieren?
-
-Erhöht vielleicht sogar den rotational & linear drift?
