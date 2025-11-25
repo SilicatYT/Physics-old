@@ -1,0 +1,24 @@
+{
+	"condition": "minecraft:entity_scores",
+	"entity": "this",
+	"scores": {
+		"Physics.Object.MaxPenetrationDepth": {
+			"min": {
+				"type": "minecraft:score",
+				"target": {
+					"type": "minecraft:fixed",
+					"name": "#Physics.MaxPenetrationDepthTotal"
+				},
+				"score": "Physics"
+			},
+			"max": {
+				"type": "minecraft:score",
+				"target": {
+					"type": "minecraft:fixed",
+					"name": "#Physics.MaxPenetrationDepthTotal"
+				},
+				"score": "Physics"
+			}
+		}
+	}
+}

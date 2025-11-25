@@ -1,6 +1,6 @@
 {
   "pack": {
-      "pack_format": 88,
-      "description": "Rigid-body physics engine for cuboids.\nCreated by SilicatYT."
+      "pack_format": 81,
+      "description": "Rigid body physics engine. Created by SilicatYT."
   }
 }

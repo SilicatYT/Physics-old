@@ -1,0 +1,1 @@
+Now that the cross products have to be performed for all components (even for cross_product_axis_?? and world_axis_? world contacts), it might be faster *not* to have the case distinction during new_contact and accumulation. Perhaps still do a distinction but with a cached macro (so no additional hardcoding).
